@@ -15,35 +15,16 @@
 主要考虑以下原因：
 
 
-* 1
-* 2
-* 3
+* 书中讲述的大部分知识，均在开发中使用
+* 内容提纲挈领，便于查阅及思考
 
-快速开始
+虚构项目
 ----
 * 待完成
 
-To Do List
-----
-
-- Travis CI 集成
-- 邮件提醒：可配置提醒事件
-- 静态资源管理器
-- 定义logo
-- 支持国际化：增加英文语言
-
-
-
-版本记录
-----
-[CHANGELOG](https://github.com/LoveYakamoz/Quantitative_Trading/releases)
 
 
 交流讨论
 ----
 - [submit issue](https://github.com/LoveYakamoz/Quantitative_Trading/issues/new)
 - email: yangpei3720@gmail.com
-
-联系方式
-----
-<img src="/image/weixin.jpg" width="200" height="260" alt="Yakamoz微信" align=left />
