@@ -1,0 +1,134 @@
+repo 仓库布局
+我们参照 aosp 的仓库，来看看 repo 到底长什么样子，下面是 .repo 目录的内容：
+
+├── manifests/
+├── manifests.git/
+├── manifest.xml -> manifests/default.xml
+├── project.list
+├── project-objects
+├── projects/
+└── repo/
+当你执行 repo init 命令来初始化仓库的时候首先执行的就是 repo 的引导脚本。该脚本会到 你指定的地方去下载 manifest 仓库，以及 repo 命令主体部分。下载好之后就放在当前目录下面 的 .repo 目录下，如上图所示。
+
+manifests：载货单的 git 仓库
+manifests.git：载货单的 git 裸仓库，不带工作区
+manifest.xml：这是一个链接文件，指向你的用于初始化工作区的载货单
+project.list：一个文本文件，里面包含所有项目名字的列表
+projects：该文件夹下包含所有 git project 的裸仓库，文件夹的层次结构跟工作区的布局 一样
+repo：这是 repo 命令的主体，其中也包含最新的 repo 命令，推荐时常使用这里面的 repo 命令更新你的计算机上的 repo 命令，因为新版本的 repo 命令提供了更多的有助于你工作的 子命令以及选项。
+什么是 manifest 仓库
+manifest 仓库是载货单的 git 仓库，是 xml 文件的 git 仓库，这些 xml 文件中包含了各个 git project 的名称，检出的 reversion，检出到哪个目录等等信息。 repo 就是利用这些 manifest 文件去分别获取各个 project。
+
+repo 命令
+下面介绍 repo 的常用命令以及选项。repo 像 git 一样，包含了不少的子命令。每个子命令都 有不同的选项。在详细子命令之前先介绍一些各个各个子命令通用的选项：
+
+-j JOBS, –jobs=JOBS 该选项指定同时进行的任务数目。因为 android 目前包含了 500 多个 git project，所以 通过该选项可以加快命令的执行。
+-h, –help 显示关于该命令的帮助信息
+repo init
+在当前目录下初始化 repo。repo init 命令只需要运行一次，它会从服务器上下载最新的 repo 源代码和 manifest 仓库，并放在当前目录下的 .repo 目录中。
+
+Usage：repo init [options]
+
+常用的选项有：
+
+-u URL, –manifest-url=URL： 这个参数指定了 manifest 仓库的地址，是必不可少的。
+
+-b REVERSION, –manifest-branch=REVISION: 这个参数指定了 manifest 仓库的分支。
+
+manifest 仓库也是一个 git 仓库，自然也存在分支。当给 repo init 提供了 -b 参数时， repo 就使用该分支的内容去抓取项目。该参数是可省略的，缺省为 default 分支。
+
+这里的 branch 跟 android 中各个 git project 中的 branch 不能混淆。我们通过这里的 -b 参数指定了不同的 manifest 分支，当 repo 把 manifest 仓库下载下来之后，就检出 这个分支；然后根据检出的 xml 文件中的 project 元素去获取相应的 git project，取下来 的 git project 检出哪个 branch 呢？这个要根据 project 元素的 reversion 属性来决 定。如果某一个 project 元素不存在 reversion 属性，就检出默认的分支。
+
+-m NAME.xml, –manifest-name=NAME.xml：初始化 manifest 文件。
+
+不管我们选择 manifest 仓库的哪个分支，最终的同步总是从某一个确定的 xml 开始的，就是 在这里指定的 xml 文件。如果没有指定 -m 参数，就使用 default.xml 文件。该文件如果 存在，位于 .repo/manifest/ 文件夹下面。如果不存在 default.xml 文件，init 命令也 没有指定 -m 参数，repo init 会报错。
+
+repo sync
+该命令同步远程仓库中的更新到本地。如果 manifest 中指定的某一个 project 目前尚不存在。 则抓取该 git project。
+
+Usage: repo sync [<project>...]
+
+repo sync 将会同步在命令行中给出的所有的 project。project 可以通过 project 名字 指定，也可以通过指定 project 的相对或者绝对路径来指定。如果没有在命令行中给出 project， 则同步 manifest 中的所有的 project。
+
+常用的选项有：
+
+-f, –force-broken：如果其中一个 project 同步失败，继续同步其它 project。
+
+默认情况下，当某一个 project 抓取失败的时候，repo sync 会终止，指定该参数可以让 repo 忽略当前 project 的错误，而继续抓取其他 project
+
+-l, –local-only：仅使用本地仓库更新工作区，不抓取远程仓库的更新
+-d, –detach：将各个 project 的 HEAD 执行 manifest 中指定的位置
+-c, –current-branch：只从 git server 中抓取在 manifest 中指定的分支
+
+该参数十分有用，如果不指定 -c 参数，则 repo 会将远程仓库中的所有分支全部抓取下来。 如此一来，对于开发了多年的仓库来说，将会大大增加同步的时间。指定该参数，repo 就只会 同步 manifest 中指定的分支。不过我们仍然可以在需要的时候通过 git fetch 命令手动 抓取需要的分支下来。
+
+-m NAME.xml, –manifest-name=MANE.xml
+
+同步时使用的初始化 xml 文件。当想切换工作区的时候，可以使用该参数加上 -b 参数再 init 一次即可。
+
+repo manifest
+manifest 命令是一个用于查看，操作 manifest 文件的命令。使用 -o 选项，会导出当前的 manifest 到一个文件中。不论你的 manifest 由几个 xml 文件生成，该命令都会生成一个单独的 载货单，生成的载货单可以放到 manifest 仓库中，后续作为 repo init 的参数。
+
+Usage： repo manifest [options]
+
+-r：保存各个 project 的 HEAD 作为 revision。该参数可以用于唯一的确定一份代码。
+
+-o NAME.xml：保存当前的 manifest 文件到文件 NAME.xml 中
+
+repo forall
+forall 子命令用于在指定的 project 中运行一个 shell 命令。这是一个十分有用的命令，使用 该命令，我们可以依次在所有的仓库中执行某些操作。
+
+Usage：
+
+repo forall [<project>...] -c <command> [<arg>...]
+repo forall -r str1 [str2] ... -c <command> [<arg>...]
+常用的选项如下：
+
+-r, --regex：只在 project 名字匹配正则表达式的项目中执行命令
+-g GROUPS，--group=GROUPS：只在属于 GROUPS 的 project 中执行命令
+-c, --command：要执行的命令
+-e, --abort-on-errors：当一条命令异常退出时，就终止执行
+
+-p：该选项控制输出
+
+这是一个十分有用的选项。使用 -p 选项，可以使输出更加可读。在每次输出之前首先输出 project 的名字，这样我们就可以知道当前的输出时哪一个 project 的输出了。
+
+-v，--verbose：这也是一个输出控制选项
+
+默认情况下，repo forall 命令只会显示命令的标准输出，而忽略标准错误。这种情况下，如 果命令发生了错误我们并不知道。因此一般执行的时候最好带上 -v 选项。
+
+-j JOBS，--jobs=JOBS：并行执行的命令的个数。
+repo forall 命令在执行的时候会设置一些环境变量，常用的如下：
+
+REPO_PROJECT：project 的名字
+REPO_PATH：相对于 Android 源码该目录的路径
+REPO_REMOTE：远程仓库的名字
+REPO_COUNT：project 的总数目
+REPO_I：当前迭代的是第几个 project，和 REPO_COUNT 结合使用，可以计算出当前完成的 百分比
+manifest 文件描述
+manifest 文件是一个描述各个 git project 的 xml 文件。下面描述了该文件中可以出现的 各个元素以及属性。
+
+manifest 元素：xml文件的根元素
+remote 元素：可以存在一个或者多个 remote 元素。
+
+remote 元素指定了你使用 repo upload 命令的时候，会将改变提交到哪个 gerrit 服务器。
+
+default 元素：通常会指定一个 default 元素。
+
+default 元素中指定的属性都是一些缺省的属性。即如果 project 元素中不存在该属性，则 使用在 default 元素中指定的属性。
+
+revision：Git 分支的名字。如果 project 元素没有指定 revision 属性，那么就使用 default 元素的该属性。revision 属性的值可以是一个 git branch，git tag，也可以是 一个 commit ID。
+
+sync-j: sync 的时候，并行工作的任务数。
+
+sync-c: 如果设置为 true，则在同步代码的时候，将只会同步 project 元素中 revision 属性中指定的分支。如果 project 元素没有指定 revision 属性，则使用 default 元素的 revision 属性。
+
+project 元素
+
+xml 文件中可以指定一个或者多个 project 元素。 每一个 project 元素都描述了一个需要 抓取到本地的 git 仓库。project 元素中有很多可以使用的属性，在此只介绍几个我们经常 使用的属性。
+
+name：git project 的名字
+
+path：该 project 的本地工作区的路径
+
+revision：该 project 要跟踪的分支的名字。名字可以是相对于 refs/heads 命名空间的， 如：master，或者绝对的，如：refs/heads/master。标签或者 48 位的 SHA-1 值理论上也 可以工作。如果没有提供该属性，则使用 default 元素中的 revision 属性。
