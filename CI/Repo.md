@@ -2,12 +2,19 @@ repo 仓库布局
 我们参照 aosp 的仓库，来看看 repo 到底长什么样子，下面是 .repo 目录的内容：
 
 ├── manifests/
+
 ├── manifests.git/
+
 ├── manifest.xml -> manifests/default.xml
+
 ├── project.list
+
 ├── project-objects
+
 ├── projects/
+
 └── repo/
+
 当你执行 repo init 命令来初始化仓库的时候首先执行的就是 repo 的引导脚本。该脚本会到 你指定的地方去下载 manifest 仓库，以及 repo 命令主体部分。下载好之后就放在当前目录下面 的 .repo 目录下，如上图所示。
 
 manifests：载货单的 git 仓库
@@ -16,7 +23,9 @@ manifest.xml：这是一个链接文件，指向你的用于初始化工作区�
 project.list：一个文本文件，里面包含所有项目名字的列表
 projects：该文件夹下包含所有 git project 的裸仓库，文件夹的层次结构跟工作区的布局 一样
 repo：这是 repo 命令的主体，其中也包含最新的 repo 命令，推荐时常使用这里面的 repo 命令更新你的计算机上的 repo 命令，因为新版本的 repo 命令提供了更多的有助于你工作的 子命令以及选项。
+
 什么是 manifest 仓库
+
 manifest 仓库是载货单的 git 仓库，是 xml 文件的 git 仓库，这些 xml 文件中包含了各个 git project 的名称，检出的 reversion，检出到哪个目录等等信息。 repo 就是利用这些 manifest 文件去分别获取各个 project。
 
 repo 命令
