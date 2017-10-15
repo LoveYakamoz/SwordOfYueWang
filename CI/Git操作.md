@@ -110,6 +110,38 @@ git merge
 解决冲突
 
 ## GIT BRANCH
+### 为什么使用分支
+* 一个分支通常代表一个单独的客户发布版本；
+* 一个分支可以封装一个开发阶段；
+* 一个分支可以隔离一个特性的开发或者研究特别复杂的bug；只是为了解决一个bug就创建一个分支，看起来是大材小用，但git的分支系统恰恰鼓励这种小规模的使用；
+* 一个分支代表一个贡献者的工作，GIT称之为特性分支或开发分支。
 
+### 使用分支 
+#### 创建分支 
+    git branch branch [starting-commit]
+如果没有指定starting-commit，就默认为当前分支上的最近提交，即，在你现在工作的地方启动一个新的分支。需要注意的是：git branch命令只是把分支名引入到版本库。并没有改变工作目录去使用新的分支。
+
+有时，你为了某个指定的提交作为分支的开始。 此时，可以使用start-commit参数如，为了在软件的2.0发布版本上修复一个bug，可以指定2.0发布分支作为新分支的提交点：
+    git branch bugfix/01 release_br
+当然这里的release_br也可以替换成某个具体的commit-id
+
+列出所有分支：
+    git branch
+
+查看某个分支：
+    git show-branch
+
+检出分支：
+    git checkout bugfix/01
+
+创建并检出新分支：
+    git checkout -b bugfix/01
+等价于：
+    git branch bugfix/01
+    git checkout bugfix/01
+
+删除分支：
+    git branch -d bugfix/01
+    
 ## GIT STASH
     用stash 还是用 cherry-pick。 取决于任务的紧急程度与代码量。
