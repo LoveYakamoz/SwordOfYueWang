@@ -1,4 +1,4 @@
-repo 仓库布局
+# repo 仓库布局
 我们参照 aosp 的仓库，来看看 repo 到底长什么样子，下面是 .repo 目录的内容：
 
 ├── manifests/
@@ -15,7 +15,7 @@ repo 仓库布局
 
 └── repo/
 
-当你执行 repo init 命令来初始化仓库的时候首先执行的就是 repo 的引导脚本。该脚本会到 你指定的地方去下载 manifest 仓库，以及 repo 命令主体部分。下载好之后就放在当前目录下面 的 .repo 目录下，如上图所示。
+当你执行 repo init 命令来初始化仓库的时候首先执行的就是 repo 的引导脚本。该脚本会到你指定的地方去下载 manifest 仓库，以及 repo 命令主体部分。下载好之后就放在当前目录下面 的 .repo 目录下，如上图所示。
 
 manifests：载货单的 git 仓库
 manifests.git：载货单的 git 裸仓库，不带工作区
@@ -24,16 +24,18 @@ project.list：一个文本文件，里面包含所有项目名字的列表
 projects：该文件夹下包含所有 git project 的裸仓库，文件夹的层次结构跟工作区的布局 一样
 repo：这是 repo 命令的主体，其中也包含最新的 repo 命令，推荐时常使用这里面的 repo 命令更新你的计算机上的 repo 命令，因为新版本的 repo 命令提供了更多的有助于你工作的 子命令以及选项。
 
-什么是 manifest 仓库
+## 什么是 manifest 仓库
 
-manifest 仓库是载货单的 git 仓库，是 xml 文件的 git 仓库，这些 xml 文件中包含了各个 git project 的名称，检出的 reversion，检出到哪个目录等等信息。 repo 就是利用这些 manifest 文件去分别获取各个 project。
+manifest 仓库是载货单的 git 仓库，是 xml 文件的 git 仓库，这些 xml 文件中包含了各个 git project 的名称，检出的 reversion，检出到哪个目录等等信息。 repo 就是利用这些 manifest文件去分别获取各个 project。
 
-repo 命令
-下面介绍 repo 的常用命令以及选项。repo 像 git 一样，包含了不少的子命令。每个子命令都 有不同的选项。在详细子命令之前先介绍一些各个各个子命令通用的选项：
+## repo 命令
+下面介绍 repo 的常用命令以及选项。repo 像 git 一样，包含了不少的子命令。每个子命令都有不同的选项。在详细子命令之前先介绍一些各个各个子命令通用的选项：
 
--j JOBS, –jobs=JOBS 该选项指定同时进行的任务数目。因为 android 目前包含了 500 多个 git project，所以 通过该选项可以加快命令的执行。
+-j JOBS, –jobs=JOBS 该选项指定同时进行的任务数目。因为 android 目前包含了 500 多个 git project，所以通过该选项可以加快命令的执行。
+
 -h, –help 显示关于该命令的帮助信息
-repo init
+
+### repo init
 在当前目录下初始化 repo。repo init 命令只需要运行一次，它会从服务器上下载最新的 repo 源代码和 manifest 仓库，并放在当前目录下的 .repo 目录中。
 
 Usage：repo init [options]
@@ -52,7 +54,7 @@ manifest 仓库也是一个 git 仓库，自然也存在分支。当给 repo ini
 
 不管我们选择 manifest 仓库的哪个分支，最终的同步总是从某一个确定的 xml 开始的，就是 在这里指定的 xml 文件。如果没有指定 -m 参数，就使用 default.xml 文件。该文件如果 存在，位于 .repo/manifest/ 文件夹下面。如果不存在 default.xml 文件，init 命令也 没有指定 -m 参数，repo init 会报错。
 
-repo sync
+### repo sync
 该命令同步远程仓库中的更新到本地。如果 manifest 中指定的某一个 project 目前尚不存在。 则抓取该 git project。
 
 Usage: repo sync [<project>...]
@@ -75,7 +77,7 @@ repo sync 将会同步在命令行中给出的所有的 project。project 可以
 
 同步时使用的初始化 xml 文件。当想切换工作区的时候，可以使用该参数加上 -b 参数再 init 一次即可。
 
-repo manifest
+### repo manifest
 manifest 命令是一个用于查看，操作 manifest 文件的命令。使用 -o 选项，会导出当前的 manifest 到一个文件中。不论你的 manifest 由几个 xml 文件生成，该命令都会生成一个单独的 载货单，生成的载货单可以放到 manifest 仓库中，后续作为 repo init 的参数。
 
 Usage： repo manifest [options]
@@ -84,8 +86,8 @@ Usage： repo manifest [options]
 
 -o NAME.xml：保存当前的 manifest 文件到文件 NAME.xml 中
 
-repo forall
-forall 子命令用于在指定的 project 中运行一个 shell 命令。这是一个十分有用的命令，使用 该命令，我们可以依次在所有的仓库中执行某些操作。
+### repo forall
+forall子命令用于在指定的 project 中运行一个 shell 命令。这是一个十分有用的命令，使用该命令，我们可以依次在所有的仓库中执行某些操作。
 
 Usage：
 
